@@ -7,6 +7,7 @@ import com.example.bean.LoginResponse;
 import com.example.entity.UserAccount;
 import com.example.service.UserAccountService;
 import com.example.utils.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,16 +19,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class AuthController {
     private final UserAccountService userAccountService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-
-    public AuthController(UserAccountService userAccountService, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
-        this.userAccountService = userAccountService;
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-    }
 
     @GetMapping()
     public String homePage() {
@@ -75,13 +71,8 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
-
-        final UserDetails userDetails
-                = userAccountService.loadUserByUsername(jwtRequest.getUsername());
-
-        final String token =
-                jwtUtil.generateToken(userDetails);
-
+        final UserDetails userDetails = userAccountService.loadUserByUsername(jwtRequest.getUsername());
+        final String token = jwtUtil.generateToken(userDetails);
         UserAccount userAccount = userAccountService.findByUserEmail(jwtRequest.getUsername());
         userAccount.setAccessToken(token);
         userAccountService.saveUserAccount(userAccount);
@@ -90,7 +81,9 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
-    private void mapToResponse(String token, UserAccount userAccount, LoginResponse loginResponse) {
+    private void mapToResponse(final String token,
+                               final UserAccount userAccount,
+                               final LoginResponse loginResponse) {
         loginResponse.setUserId(userAccount.getId());
         loginResponse.setCompanyName(userAccount.getCompanyName());
         loginResponse.setUserEmail(userAccount.getUserEmail());

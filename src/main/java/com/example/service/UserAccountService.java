@@ -3,6 +3,7 @@ package com.example.service;
 
 import com.example.entity.UserAccount;
 import com.example.repo.UserAccountRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,22 +14,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 @Service
+@RequiredArgsConstructor
 public class UserAccountService implements UserDetailsService {
+
     private final UserAccountRepository userAccountRepository;
-
-    public UserAccountService(UserAccountRepository userAccountRepository) {
-        this.userAccountRepository = userAccountRepository;
-    }
-
 //    public UserAccount findByUsername(String username) {
 //        return userAccountRepository.findByUsername(username);
 //    }
-
-    public UserAccount findByUserEmail(String username) {
+    public UserAccount findByUserEmail(final String username) {
         return userAccountRepository.findByUserEmail(username);
     }
-
-    public void saveUserAccount(UserAccount userAccount) {
+    public void saveUserAccount(final UserAccount userAccount) {
         userAccountRepository.save(userAccount);
     }
 
@@ -38,7 +34,7 @@ public class UserAccountService implements UserDetailsService {
 //    }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
         UserAccount userAccount = userAccountRepository.findByUserEmail(username);
         if (userAccount == null) {
             throw new UsernameNotFoundException("User not found");
